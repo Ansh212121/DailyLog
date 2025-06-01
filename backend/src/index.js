@@ -8,15 +8,23 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cookieParser());
 //cors({ origin: "http://localhost:5173", credentials: true })
-app.use(
-  cors({
-    origin: "http://localhost:5173", // frontend origin
-    credentials: true, // allow cookies/auth headers
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // allowed headers in requests
-  })
-);
-  
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://daily-log-smoky.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
+
+
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const entryRoutes = require("./routes/entryRoutes");
